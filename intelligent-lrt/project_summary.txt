@@ -1,0 +1,177 @@
+Hello! Here is a detailed summary of the Intelligent LRT project. I hope this overview is helpful for you.
+
+Project Introduction
+
+The Intelligent LRT (Light Rail Transit) project is a comprehensive mobile application built with React Native and Expo. It is designed to modernize the railway experience in Sri Lanka by providing a suite of powerful tools for both passengers and administrators.
+
+The application features real-time train tracking, advanced scheduling, a seamless ticketing system with QR code integration, and an intelligent delay prediction module. To cater to different needs, the system supports three distinct user roles: regular Users, Admins (for train management), and Super Admins (for system-wide oversight).
+
+This document provides a technical breakdown of the project, including the core technologies used and a file-by-file analysis of its functions and architecture.
+
+Core Technologies Used:
+
+  Framework: React Native with Expo
+  State Management: Redux Toolkit
+  Navigation: React Navigation (Stack and Tab navigators)
+  UI Components: React Native Paper, custom components
+  Maps: react-native-maps
+  QR Codes: react-native-qrcode-svg
+  Location: expo-location
+  Authentication: Google OAuth, custom local authentication
+  Database: Mongoose for MongoDB
+  Styling: React Native StyleSheet API with a custom Theme Context (for light/dark modes)
+  Linting: ESLint with eslint-config-expo
+  Build Tool: Metro bundler with custom configuration
+
+
+File by File Analysis:
+
+Root Directory
+
+  'App.js': This is the root component. It sets up the Redux Provider, ThemeProvider, and the main AppNavigator.
+    Functions: App()
+    Technologies: React, Redux, Expo StatusBar, SafeAreaProvider
+
+  'babel.config.js': This file handles Babel configuration.
+    Technologies: Babel, expo preset, module-resolver plugin, react-native-reanimated plugin
+
+  'crypto-mock.js': This is a polyfill for the Node.js crypto module.
+    Functions: getRandomValues(), randomBytes()
+
+  'metro.config.js': This file contains the custom Metro bundler configuration.
+    Technologies: Metro, CORS headers, custom module resolution
+
+  'nanoid-polyfill.js': This is a polyfill for nanoid.
+    Technologies: react-native-get-random-values
+
+
+Source Directory: src/config
+
+  'dbConfig.js': This file sets up the MongoDB connection.
+    Functions: connectDB()
+    Technologies: Mongoose, dotenv
+
+
+Source Directory: src/context
+
+  'ThemeContext.js': This file provides a React Context for theming.
+    Functions: ThemeProvider(), useTheme()
+    Technologies: React Context API, useColorScheme
+
+
+Source Directory: src/data
+
+  'sriLankaRailway.js': This file contains static data for stations, routes, and train types.
+    Functions: getStationByType(), getStationsForRoute(), getTrainStops()
+
+  'trainData.js': This file contains static data for train schedules and fares.
+    Functions: findAvailableTrains(), calculateFare(), formatPrice()
+
+
+Source Directory: src/models
+
+  'trainSchema.js': This file defines the Mongoose schemas.
+    Models: Station, Route, Train, Schedule
+    Technologies: Mongoose
+
+
+Source Directory: src/navigation
+
+  'AppNavigator.js': This file handles the main navigation setup.
+    Functions: UserTabs(), AdminTabs(), SuperAdminTabs(), AppNavigator()
+    Technologies: React Navigation, Redux
+
+
+Source Directory: src/redux/slices
+
+  'authSlice.js': This slice manages authentication state.
+    Async Thunks: googleSignIn(), signOut
+    Selectors: selectAuth
+    Technologies: Redux Toolkit
+
+  'predictionSlice.js': This slice manages delay prediction state.
+    Async Thunks: fetchSystemDelayPredictions(), fetchDelayPredictions
+    Selectors: selectSystemPredictions, selectCurrentPrediction, selectIsLoadingPrediction
+    Functions: getDelayRiskLevel()
+
+  'scheduleSlice.js': This slice manages train schedules.
+    Async Thunks: fetchSchedules(), updateSchedule
+    Selectors: selectSchedules, selectIsLoadingSchedules
+
+  'ticketSlice.js': This slice manages user tickets.
+    Async Thunks: fetchTickets(), bookTicket
+    Selectors: selectTickets, selectIsLoadingTickets
+
+  'trainSlice.js': This slice manages train data.
+    Async Thunks: fetchTrains(), updateTrain
+    Selectors: selectTrains, selectIsLoadingTrains
+
+
+Source Directory: src/redux
+
+  'store.js': This file configures the Redux store.
+    Functions: configureStore()
+    Technologies: Redux Toolkit
+
+
+Source Directory: src/screens/admin
+
+  'AdminDashboardScreen.js': This is the dashboard for train admins.
+    Functions: AdminDashboardScreen(), updateTrainStatus(), markTrainAtStation()
+    Technologies: React, useState
+
+  'AdminTrackingScreen.js': This screen provides real-time train tracking for admins.
+    Functions: AdminTrackingScreen(), handleTrainSelect(), toggleTracking(), handleStationArrival()
+    Technologies: React, react-native-maps, expo-location
+
+
+Source Directory: src/screens/auth
+
+  'LoginScreen.js': This is the login screen.
+    Functions: LoginScreen(), handleCredentialLogin(), handleGoogleSignIn(), handleDemoLogin()
+    Technologies: React, Redux, Google Auth
+
+
+Source Directory: src/screens/superAdmin
+
+  'PredictionScreen.js': This screen is the delay prediction interface.
+    Functions: PredictionScreen(), handleTrainSelect(), renderRiskIndicator()
+    Technologies: React, Redux, React Native Paper
+
+  'SuperAdminDashboardScreen.js': This is the system overview dashboard.
+    Functions: SuperAdminDashboardScreen(), getActivityIcon(), getActivityColor()
+    Technologies: React, useTheme
+
+
+Source Directory: src/screens/user
+
+  'UserDashboardScreen.js': This is the main user dashboard.
+    Functions: UserDashboardScreen()
+    Technologies: React, useEffect, useState
+
+  'UserTicketScreen.js': This screen handles ticket purchasing and management.
+    Functions: UserTicketScreen(), calculatePrice(), handleBuyTicket()
+    Technologies: React, react-native-qrcode-svg, @react-native-picker/picker
+
+  'UserTrackingScreen.js': This screen provides real-time train tracking for users.
+    Functions: UserTrackingScreen(), renderTrainList(), getStationsForSelectedTrain()
+    Technologies: React, react-native-maps
+
+
+Source Directory: src/services
+
+  'trainService.js': This is a mock service for train data.
+    Functions: getTrainDetails(), updateTrainLocation()
+
+
+Source Directory: src/utils
+
+  'googleAuth.js': This is a Google authentication helper.
+    Functions: useGoogleAuth(), getGoogleUserInfo()
+    Technologies: expo-auth-session/providers/google
+
+  'localAuth.js': This is a local authentication helper.
+    Functions: authenticateWithRole()
+
+
+This summary was generated by Cascade.

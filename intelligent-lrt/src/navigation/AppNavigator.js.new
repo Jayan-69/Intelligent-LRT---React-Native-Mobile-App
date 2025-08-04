@@ -1,0 +1,380 @@
+import React from 'react';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
+
+// Import ThemeContext utility
+import { useTheme } from '../context/ThemeContext';
+
+// Auth Screens
+import LoginScreen from '../screens/auth/LoginScreen';
+
+// User Screens
+import UserDashboardScreen from '../screens/user/UserDashboardScreen';
+import UserTicketScreen from '../screens/user/UserTicketScreen';
+import UserTrackingScreen from '../screens/user/UserTrackingScreen';
+import DelayPredictionScreen from '../screens/user/DelayPredictionScreen';
+
+// Admin Screens
+import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen';
+import AdminTrackingScreen from '../screens/admin/AdminTrackingScreen';
+
+// Super Admin Screens
+import SuperAdminDashboardScreen from '../screens/superAdmin/SuperAdminDashboardScreen';
+import TimetableManagementScreen from '../screens/superAdmin/TimetableManagementScreen';
+import TrainManagementScreen from '../screens/superAdmin/TrainManagementScreen';
+import PricingManagementScreen from '../screens/superAdmin/PricingManagementScreen';
+import PredictionScreen from '../screens/superAdmin/PredictionScreen';
+
+// Re-export useTheme for convenience
+export { useTheme };
+
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+// Logout Button Component
+const LogoutButton = ({ navigation, tintColor = '#fff' }) => {
+  const handleLogout = () => {
+    // Use the navigate method instead of reset to avoid warnings
+    // The Login screen can handle preventing back navigation
+    navigation.navigate('Login', { loggedOut: true });
+  };
+  
+  return (
+    <TouchableOpacity 
+      onPress={handleLogout}
+      style={{ marginRight: 15 }}
+    >
+      <Ionicons name="log-out-outline" size={24} color={tintColor} />
+    </TouchableOpacity>
+  );
+};
+
+// Theme Toggle Button Component
+const ThemeToggleButton = ({ tintColor = '#fff' }) => {
+  const { isDarkMode, toggleTheme } = useTheme();
+  
+  return (
+    <TouchableOpacity 
+      onPress={toggleTheme}
+      style={{ marginRight: 15 }}
+    >
+      <Ionicons 
+        name={isDarkMode ? "sunny-outline" : "moon-outline"} 
+        size={24} 
+        color={tintColor} 
+      />
+    </TouchableOpacity>
+  );
+};
+
+// Bottom tab navigator for User
+const UserTabNavigator = () => {
+  const { colors, isDarkMode } = useTheme();
+  
+  return (
+    <Tab.Navigator
+      screenOptions={({ route, navigation }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === 'Dashboard') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Tickets') {
+            iconName = focused ? 'ticket' : 'ticket-outline';
+          } else if (route.name === 'Live Tracking') {
+            iconName = focused ? 'location' : 'location-outline';
+          } else if (route.name === 'Predictions') {
+            iconName = focused ? 'analytics' : 'analytics-outline';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: isDarkMode ? '#888' : 'gray',
+        tabBarStyle: { 
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
+        },
+        headerStyle: {
+          backgroundColor: colors.primary,
+        },
+        headerTintColor: '#fff',
+        headerRight: () => (
+          <View style={{ flexDirection: 'row' }}>
+            <ThemeToggleButton />
+            <LogoutButton navigation={navigation} />
+          </View>
+        ),
+      })}
+    >
+      <Tab.Screen 
+        name="Dashboard"
+        component={UserDashboardScreen} 
+        options={{
+          title: 'User Dashboard',
+          headerShown: true,
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ color, fontSize: 12 }}>Dashboard</Text>
+          )
+        }}
+      />
+      <Tab.Screen 
+        name="Tickets"
+        component={UserTicketScreen} 
+        options={{
+          title: 'Your Tickets',
+          headerShown: true,
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ color, fontSize: 12 }}>Tickets</Text>
+          )
+        }}
+      />
+      <Tab.Screen 
+        name="Live Tracking"
+        component={UserTrackingScreen} 
+        options={{
+          title: 'Live Train Tracking',
+          headerShown: true,
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ color, fontSize: 12 }}>Live Tracking</Text>
+          )
+        }}
+      />
+      <Tab.Screen 
+        name="Predictions" 
+        component={DelayPredictionScreen} 
+        options={{
+          title: 'Delay Predictions',
+          headerShown: true,
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ color, fontSize: 12 }}>Predictions</Text>
+          )
+        }}
+      />
+    </Tab.Navigator>
+  );
+};
+
+// Bottom tab navigator for Admin
+const AdminTabNavigator = () => {
+  const { colors, isDarkMode } = useTheme();
+
+  return (
+    <Tab.Navigator
+      screenOptions={({ route, navigation }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === 'AdminDashboardTab') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'TrackingTab') {
+            iconName = focused ? 'location' : 'location-outline';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: isDarkMode ? '#888' : 'gray',
+        tabBarStyle: { 
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
+        },
+        headerStyle: {
+          backgroundColor: colors.primary,
+        },
+        headerTintColor: '#fff',
+        headerRight: () => (
+          <View style={{ flexDirection: 'row' }}>
+            <ThemeToggleButton />
+            <LogoutButton navigation={navigation} />
+          </View>
+        ),
+      })}
+    >
+      <Tab.Screen 
+        name="AdminDashboardTab" 
+        component={AdminDashboardScreen} 
+        options={{
+          title: 'Admin Dashboard',
+          headerShown: true,
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ color, fontSize: 12 }}>Dashboard</Text>
+          )
+        }}
+      />
+      <Tab.Screen 
+        name="TrackingTab" 
+        component={AdminTrackingScreen} 
+        options={{
+          title: 'Train Tracking',
+          headerShown: true,
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ color, fontSize: 12 }}>Train Tracking</Text>
+          )
+        }}
+      />
+    </Tab.Navigator>
+  );
+};
+
+// Bottom tab navigator for Super Admin
+const SuperAdminTabNavigator = () => {
+  const { colors, isDarkMode } = useTheme();
+
+  return (
+    <Tab.Navigator
+      screenOptions={({ route, navigation }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === 'SuperAdminDashboardTab') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'TimetablesTab') {
+            iconName = focused ? 'calendar' : 'calendar-outline';
+          } else if (route.name === 'TrainsTab') {
+            iconName = focused ? 'train' : 'train-outline';
+          } else if (route.name === 'PricingTab') {
+            iconName = focused ? 'cash' : 'cash-outline';
+          } else if (route.name === 'PredictionsTab') {
+            iconName = focused ? 'analytics' : 'analytics-outline';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: isDarkMode ? '#888' : 'gray',
+        tabBarStyle: { 
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
+        },
+        headerStyle: {
+          backgroundColor: colors.primary,
+        },
+        headerTintColor: '#fff',
+        headerRight: () => (
+          <View style={{ flexDirection: 'row' }}>
+            <ThemeToggleButton />
+            <LogoutButton navigation={navigation} />
+          </View>
+        ),
+      })}
+    >
+      <Tab.Screen 
+        name="SuperAdminDashboardTab" 
+        component={SuperAdminDashboardScreen} 
+        options={{
+          title: 'Super Admin Dashboard',
+          headerShown: true,
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ color, fontSize: 12 }}>Dashboard</Text>
+          )
+        }}
+      />
+      <Tab.Screen 
+        name="TimetablesTab" 
+        component={TimetableManagementScreen} 
+        options={{ 
+          title: 'Timetable Management',
+          headerShown: true,
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ color, fontSize: 12 }}>Timetables</Text>
+          )
+        }}
+      />
+      <Tab.Screen 
+        name="TrainsTab" 
+        component={TrainManagementScreen} 
+        options={{ 
+          title: 'Train Management',
+          headerShown: true,
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ color, fontSize: 12 }}>Trains</Text>
+          )
+        }}
+      />
+      <Tab.Screen 
+        name="PricingTab" 
+        component={PricingManagementScreen} 
+        options={{ 
+          title: 'Pricing Management',
+          headerShown: true,
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ color, fontSize: 12 }}>Pricing</Text>
+          )
+        }}
+      />
+      <Tab.Screen 
+        name="PredictionsTab" 
+        component={PredictionScreen} 
+        options={{ 
+          title: 'System Predictions',
+          headerShown: true,
+          tabBarLabel: ({ focused, color }) => (
+            <Text style={{ color, fontSize: 12 }}>Predictions</Text>
+          )
+        }}
+      />
+    </Tab.Navigator>
+  );
+};
+
+// Main App Navigator Component with authentication check
+const AppNavigatorContent = () => {
+  // Get authentication state from Redux
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+  const role = useSelector(state => state.auth.role);
+  const { theme: colors, isDarkMode } = useTheme();
+  
+  // Create navigation theme based on current theme mode
+  const navigationTheme = isDarkMode 
+    ? { ...DarkTheme, colors: { ...DarkTheme.colors, ...colors } }
+    : { ...DefaultTheme, colors: { ...DefaultTheme.colors, ...colors } };
+  
+  return (
+    <NavigationContainer theme={navigationTheme}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {/* Common login screen for all users */}
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen}
+          options={{
+            animationTypeForReplace: !isAuthenticated ? 'pop' : 'push',
+          }}
+        />
+        
+        {/* User screens */}
+        <Stack.Screen 
+          name="UserDashboard" 
+          component={UserTabNavigator}
+          options={{ headerShown: false }}
+        />
+        
+        {/* Admin screens */}
+        <Stack.Screen 
+          name="AdminDashboard" 
+          component={AdminTabNavigator}
+          options={{ headerShown: false }}
+        />
+        
+        {/* SuperAdmin screens */}
+        <Stack.Screen 
+          name="SuperAdminDashboard" 
+          component={SuperAdminTabNavigator}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
+
+// Main navigator
+const AppNavigator = () => {
+  // ThemeProvider is now in App.js, so we don't need to wrap it here
+  return <AppNavigatorContent />;
+};
+
+export default AppNavigator;

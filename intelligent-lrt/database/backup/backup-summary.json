@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-08-04T20:06:18.267Z",
+  "collections": {
+    "stations": 0,
+    "routes": 0,
+    "trains": 0,
+    "users": 0,
+    "notices": 0,
+    "train_notices": 0,
+    "quick_messages": 0
+  },
+  "totalRecords": 0
+}

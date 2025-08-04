@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Intelligent LRT",
+    "slug": "intelligent-lrt-management",
+    "description": "Comprehensive Light Rail Transit Management System",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jp69.intelligentlrtmanagement"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.jp69.intelligentlrtmanagement",
+      "permissions": [],
+      "usesCleartextTraffic": true,
+      "googleServicesFile": "./google-services.json"
+    },
+    "web": {
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
+    },
+    "platforms": [
+      "android"
+    ],
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "scheme": "intelligent-lrt-management",
+    "owner": "anonymous",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "65b42869-bd46-403e-a87d-79f1963fe14d"
+      }
+    }
+  }
+}
