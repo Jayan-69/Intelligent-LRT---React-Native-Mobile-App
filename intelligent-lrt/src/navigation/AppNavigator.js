@@ -21,6 +21,8 @@ import UserTrackingScreen from '../screens/user/UserTrackingScreen';
 import UserNoticesScreen from '../screens/user/UserNoticesScreen';
 import UserSchedulesScreen from '../screens/user/UserSchedulesScreen';
 import DelayPredictionScreen from '../screens/user/DelayPredictionScreen';
+import AvailableTrainsScreen from '../screens/user/AvailableTrainsScreen';
+import BookTicketScreen from '../screens/user/BookTicketScreen';
 
 // Admin Screens
 import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen';
@@ -79,6 +81,17 @@ const commonScreenOptions = (isDarkMode) => ({
 });
 
 // Role-based Tab Navigators
+const UserStackNavigator = () => {
+  const { isDarkMode } = useTheme();
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="UserTabs" component={UserTabNavigator} />
+      <Stack.Screen name="AvailableTrains" component={AvailableTrainsScreen} />
+      <Stack.Screen name="BookTicket" component={BookTicketScreen} />
+    </Stack.Navigator>
+  );
+};
+
 const UserTabNavigator = () => {
   const { isDarkMode } = useTheme();
   return (
@@ -218,7 +231,7 @@ const MainStack = () => {
   
   try {
     switch (role) {
-      case 'user': return <UserTabNavigator />;
+      case 'user': return <UserStackNavigator />;
       case 'admin': return <AdminTabNavigator />;
       case 'superadmin': return <SuperAdminTabNavigator />;
       default: return null; // Or a fallback screen

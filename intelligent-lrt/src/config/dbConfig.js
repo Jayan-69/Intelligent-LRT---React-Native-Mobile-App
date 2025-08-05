@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
-// MongoDB connection URI - using the MongoDB Atlas connection from setup summary
-const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://lrt-admin:Sj0k80NUWfvhFFPl@cluster0.ubpov8g.mongodb.net/lrt_tracking';
+// MongoDB connection URI - using MongoDB Atlas cloud database
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://lrt-admin:Sj0k80NUWfvhFFPl@cluster0.ubpov8g.mongodb.net/lrt_tracking?retryWrites=true&w=majority&appName=Cluster0';
 
 // Connect to MongoDB
 const connectDB = async () => {

@@ -29,7 +29,12 @@ const IP_ADDRESSES_TO_TRY = [
   ...(Platform.OS === 'android' ? ['10.0.2.2'] : []),
   ...(Platform.OS === 'ios' ? ['localhost'] : []),
   
+  // Current network IPs
+  '192.168.153.49',  // Current main network IP
+  '192.168.56.1',    // VirtualBox network IP
+  
   // Common development IPs
+  '192.168.86.1',  // Local server IP
   '192.168.1.100',
   '192.168.1.101',
   '192.168.1.102',
@@ -141,13 +146,12 @@ export const getServerBaseUrl = async () => {
 export const getApiBaseUrl = async () => {
   try {
     const baseUrl = await getServerBaseUrl();
-    const apiUrl = `${baseUrl}/api/trains`;
-    console.log(`🔗 Using API base URL: ${apiUrl}`);
-    return apiUrl;
+    console.log(`🔗 Using API base URL: ${baseUrl}`);
+    return baseUrl;
   } catch (error) {
     console.error('❌ Error getting API base URL:', error);
     // Fallback to localhost
-    return `http://localhost:${SERVER_PORT}/api/trains`;
+    return `http://localhost:${SERVER_PORT}`;
   }
 };
 

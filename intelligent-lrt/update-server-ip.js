@@ -11,7 +11,7 @@ function getLocalIPAddresses() {
         reject(error);
         return;
       }
-
+      
       const lines = stdout.split('\n');
       const ips = [];
       
@@ -93,6 +93,9 @@ async function updateServerIP() {
           // Update the IP addresses array to prioritize the working IP
           const newIPs = [
             ip,
+            '192.168.153.49',  // Current main network IP
+            '192.168.56.1',    // VirtualBox network IP
+            '192.168.86.1',  // Local database IP
             '10.0.2.2',  // Android emulator
             'localhost',
             '127.0.0.1',

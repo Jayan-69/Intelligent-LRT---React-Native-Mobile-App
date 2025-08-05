@@ -124,10 +124,14 @@ const trainRoutes = require('./routes/trainRoutes');
 const noticeRoutes = require('./routes/noticeRoutes');
 const trainNoticeRoutes = require('./routes/trainNoticeRoutes');
 const routeRoutes = require('./routes/routeRoutes');
+const bookingRoutes = require('./routes/trains'); // New booking routes
+const stationRoutes = require('./routes/stations'); // New station routes
 
 app.use('/api/trains', trainRoutes);
 app.use('/api/notices', noticeRoutes);
 app.use('/api/notices', trainNoticeRoutes); // New routes for train notices and quick messages
 app.use('/api/routes', routeRoutes); // New routes for schedule management
+app.use('/api', bookingRoutes); // New booking and ticket routes
+app.use('/api', stationRoutes); // New station routes
 
 // Server is started in the startServer function after MongoDB connection is established
