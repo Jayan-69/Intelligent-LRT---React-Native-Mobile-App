@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { 
   View, 
   Text, 
@@ -14,8 +15,11 @@ import { useTheme } from '../../context/ThemeContext';
 import { getApiBaseUrl } from '../../config/apiConfig';
 
 const BookTicketScreen = ({ route, navigation }) => {
-  const { train } = route.params;
+  // Correctly extract both the train and the selected date from navigation parameters
+  const { train, date } = route.params; // Ensure date is destructured
+
   const { colors } = useTheme();
+  const user = useSelector((state) => state.auth.user);
   const [loading, setLoading] = useState(false);
   const [passengerDetails, setPassengerDetails] = useState({
     name: '',
@@ -38,7 +42,7 @@ const BookTicketScreen = ({ route, navigation }) => {
     return train.price * selectedSeats;
   };
 
-  const handleBookTicket = async () => {
+    const handleBookTicket = async () => {
     // Validate form
     if (!passengerDetails.name.trim()) {
       Alert.alert('Error', 'Please enter passenger name');
@@ -57,11 +61,15 @@ const BookTicketScreen = ({ route, navigation }) => {
     try {
       const apiUrl = await getApiBaseUrl();
       const bookingData = {
+        userId: user.id,
         trainId: train.id,
+        trainName: train.trainName,
         trainNumber: train.trainNumber,
         from: train.from,
         to: train.to,
         departureTime: train.departureTime,
+        arrivalTime: train.arrivalTime,
+        date: date, // Correctly use the date from route params
         passengerDetails,
         numberOfSeats: selectedSeats,
         totalAmount: calculateTotal(),
@@ -113,6 +121,8 @@ const BookTicketScreen = ({ route, navigation }) => {
           }
         ]
       );
+    } finally {
+      setLoading(false);
     }
   };
 

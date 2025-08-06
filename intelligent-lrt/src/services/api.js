@@ -76,6 +76,11 @@ export const predictionAPI = {
   getSystemPredictions: () => api.get('/predictions/system'),
 };
 
+// Notices API
+export const noticesAPI = {
+  getNotices: () => api.get('/notices'),
+};
+
 // Mock API functions for development (without real backend)
 export const mockAPI = {
   // Authentication
@@ -92,7 +97,7 @@ export const mockAPI = {
     }
     
     return { data: { 
-      user: { id: 'user-123', name: 'Regular User', email: credentials.email },
+            user: { id: 'user-123', name: 'User', email: credentials.email },
       role: 'user',
       token: 'mock-jwt-token'
     }};
@@ -219,6 +224,27 @@ export const mockAPI = {
         qrCode: 'TKT002-USERID-20250725-1115',
         trainId: 'Local 205',
         purchasedAt: '2025-07-18T15:45:00Z'
+      },
+    ]};
+  },
+  
+  // Notices
+  getNotices: async () => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return { data: [
+      {
+        id: '1',
+        title: 'Weekend Schedule Update',
+        content: 'Please be advised that weekend train services will operate on a revised schedule starting this Saturday. Check the app for the latest timings.',
+        date: '2025-08-05T10:00:00Z',
+        level: 'info',
+      },
+      {
+        id: '2',
+        title: 'System Maintenance',
+        content: 'Our booking system will be temporarily unavailable for scheduled maintenance on Sunday from 2:00 AM to 4:00 AM.',
+        date: '2025-08-04T15:30:00Z',
+        level: 'warning',
       },
     ]};
   },

@@ -20,7 +20,7 @@ export const authenticateWithRole = (role = 'user') => {
   const mockUserData = {
     id: `local-${validRole}-${Date.now()}`,
     email: `test-${validRole}@example.com`,
-    name: `Test ${validRole.charAt(0).toUpperCase() + validRole.slice(1)}`,
+        name: 'User',
     picture: 'https://via.placeholder.com/150',
     role: validRole,
     authProvider: 'local',

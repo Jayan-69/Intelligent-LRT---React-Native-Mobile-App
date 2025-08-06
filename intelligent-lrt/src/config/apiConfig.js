@@ -34,6 +34,7 @@ const IP_ADDRESSES_TO_TRY = [
   '192.168.56.1',    // VirtualBox network IP
   
   // Common development IPs
+  '10.34.215.44',
   '192.168.86.1',  // Local server IP
   '192.168.1.100',
   '192.168.1.101',
@@ -46,6 +47,7 @@ const IP_ADDRESSES_TO_TRY = [
   '10.0.0.100',
   '10.0.0.101',
   '10.0.0.102',
+  
   
   // Localhost variants
   'localhost',
@@ -72,7 +74,7 @@ const findWorkingIp = async () => {
         console.log(`✅ Using cached working IP: ${lastWorkingIp}`);
         return lastWorkingIp;
       }
-    } catch (error) {
+    } catch (_error) {
       console.log(`❌ Cached IP ${lastWorkingIp} failed, trying others...`);
       lastWorkingIp = null;
     }
@@ -91,7 +93,7 @@ const findWorkingIp = async () => {
         console.log(`✅ Platform IP ${platformIP} works!`);
         return platformIP;
       }
-    } catch (error) {
+    } catch (_error) {
       console.log(`❌ Platform IP ${platformIP} failed`);
     }
   }

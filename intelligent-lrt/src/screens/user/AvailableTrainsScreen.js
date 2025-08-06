@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   View, 
   Text, 
@@ -6,7 +6,6 @@ import {
   ScrollView, 
   TouchableOpacity, 
   TextInput,
-  Alert,
   ActivityIndicator,
   RefreshControl
 } from 'react-native';
@@ -22,6 +21,7 @@ const AvailableTrainsScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFrom, setSelectedFrom] = useState('');
   const [selectedTo, setSelectedTo] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [showFilters, setShowFilters] = useState(false);
 
   // Sample stations data - will be replaced with database data
@@ -30,9 +30,9 @@ const AvailableTrainsScreen = ({ navigation }) => {
   useEffect(() => {
     fetchAvailableTrains();
     fetchStations();
-  }, []);
+  }, [fetchAvailableTrains, fetchStations]);
 
-  const fetchStations = async () => {
+  const fetchStations = useCallback(async () => {
     try {
       const apiUrl = await getApiBaseUrl();
       const response = await fetch(`${apiUrl}/api/stations`);
@@ -61,9 +61,9 @@ const AvailableTrainsScreen = ({ navigation }) => {
         'Bandarawela', 'Ella', 'Demodara', 'Badulla'
       ]);
     }
-  };
+  }, []);
 
-  const fetchAvailableTrains = async () => {
+  const fetchAvailableTrains = useCallback(async () => {
     try {
       setLoading(true);
       const apiUrl = await getApiBaseUrl();
@@ -83,7 +83,7 @@ const AvailableTrainsScreen = ({ navigation }) => {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
 
   const getSampleTrains = () => [
     {
@@ -154,7 +154,13 @@ const AvailableTrainsScreen = ({ navigation }) => {
   });
 
   const handleBookTicket = (train) => {
-    navigation.navigate('BookTicket', { train });
+    navigation.navigate('BookTicket', { train, date: date });
+  };
+
+  const handleDateChange = (offset) => {
+    const currentDate = new Date(date);
+    currentDate.setDate(currentDate.getDate() + offset);
+    setDate(currentDate.toISOString().split('T')[0]);
   };
 
   const getStatusColor = (status) => {
@@ -194,6 +200,17 @@ const AvailableTrainsScreen = ({ navigation }) => {
           onPress={() => setShowFilters(!showFilters)}
         >
           <Ionicons name="filter" size={24} color={colors.primary} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Date Selector */}
+      <View style={[styles.dateSelectorContainer, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <TouchableOpacity onPress={() => handleDateChange(-1)} style={styles.dateArrow}>
+          <Ionicons name="chevron-back" size={28} color={colors.primary} />
+        </TouchableOpacity>
+        <Text style={[styles.dateText, { color: colors.text }]}>{new Date(date).toDateString()}</Text>
+        <TouchableOpacity onPress={() => handleDateChange(1)} style={styles.dateArrow}>
+          <Ionicons name="chevron-forward" size={28} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -276,7 +293,7 @@ const AvailableTrainsScreen = ({ navigation }) => {
           </View>
         ) : (
           filteredTrains.map((train) => (
-            <View key={train.id} style={[styles.trainCard, { backgroundColor: colors.surface }]}>
+            <View key={train.id} style={[styles.trainCard, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
               <View style={styles.trainHeader}>
                 <View style={styles.trainInfo}>
                   <Text style={[styles.trainName, { color: colors.text }]}>{train.trainName}</Text>
@@ -448,6 +465,21 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+  },
+  dateSelectorContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+  },
+  dateArrow: {
+    padding: 5,
+  },
+  dateText: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   trainHeader: {
     flexDirection: 'row',

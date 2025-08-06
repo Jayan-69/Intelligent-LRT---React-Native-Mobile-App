@@ -3,6 +3,7 @@ const router = express.Router();
 const Train = require('../models/Train');
 const Route = require('../models/Route');
 const Station = require('../models/Station');
+const Ticket = require('../models/Ticket'); // Import the Ticket model
 
 // Get available trains
 router.get('/available', async (req, res) => {
@@ -39,107 +40,113 @@ router.get('/available', async (req, res) => {
   }
 });
 
-// Book a ticket
+// Book a ticket and save it to the database
 router.post('/book', async (req, res) => {
   try {
     console.log('📝 Booking request received:', req.body);
-    
+
     const {
+      userId,
       trainId,
+      trainName,
       trainNumber,
       from,
       to,
       departureTime,
-      passengerDetails,
+      arrivalTime,
+      date,
+      passengerDetails, // Contains name, nic, phone, email, seatPreference
       numberOfSeats,
       totalAmount,
       paymentMethod
     } = req.body;
 
-    // Validate required fields
-    if (!trainNumber || !from || !to || !passengerDetails || !numberOfSeats) {
-      return res.status(400).json({ 
-        error: 'Missing required fields',
-        required: ['trainNumber', 'from', 'to', 'passengerDetails', 'numberOfSeats']
-      });
+    // Basic validation
+    if (!userId || !trainId || !passengerDetails || !numberOfSeats) {
+      return res.status(400).json({ error: 'Missing required booking information.' });
     }
 
-    // Generate ticket ID
-    const ticketId = `T${Date.now()}`;
-    
-    // Generate seat number
-    const seatNumber = generateSeatNumber();
-    
-    // Create ticket object
-    const ticket = {
-      id: ticketId,
-      trainName: `${getTrainTypeName(trainNumber.charAt(0))} Train ${trainNumber}`,
-      trainNumber: trainNumber,
-      from: from,
-      to: to,
-      departureTime: departureTime,
-      arrivalTime: calculateArrivalTime(departureTime, from, to),
-      date: new Date().toISOString().split('T')[0],
-      status: 'Active',
-      seatNumber: seatNumber,
-      price: totalAmount,
-      passengerName: passengerDetails.name,
-      bookingDate: new Date().toISOString().split('T')[0],
-      passengerDetails: passengerDetails,
-      numberOfSeats: numberOfSeats,
-      paymentMethod: paymentMethod
-    };
+    // Generate seat numbers for the booking
+    const seatNumbers = Array.from({ length: numberOfSeats }, () => generateSeatNumber());
 
-    console.log('✅ Ticket created successfully:', ticketId);
-
-    // In a real application, you would save this to a Ticket collection
-    // For now, we'll return the ticket data
-    res.json({ 
-      success: true, 
-      ticketId: ticketId,
-      ticket: ticket,
-      message: 'Booking successful!'
+    // Create a new ticket document with the correct nested structure
+    const newTicket = new Ticket({
+      userId: userId,
+      trainId: trainId,
+      trainDetails: {
+        trainName: trainName,
+        trainNumber: trainNumber,
+        from: from,
+        to: to,
+        departureTime: departureTime,
+        arrivalTime: arrivalTime,
+        date: date,
+      },
+      passengerDetails: {
+        name: passengerDetails.name,
+        nic: passengerDetails.nic,
+        phone: passengerDetails.phone,
+        email: passengerDetails.email,
+      },
+      seatInfo: {
+        numberOfSeats: numberOfSeats,
+        seatType: passengerDetails.seatPreference, // Correctly mapped from passengerDetails
+        seatNumbers: seatNumbers,
+      },
+      paymentDetails: {
+        amount: totalAmount,
+        method: paymentMethod,
+        status: 'Paid',
+      },
+      status: 'Confirmed', // Default status
     });
+
+    const savedTicket = await newTicket.save();
+
+    console.log('✅ Ticket saved successfully to DB:', savedTicket._id);
+
+    res.status(201).json({
+      success: true,
+      message: 'Booking successful!',
+      ticketId: savedTicket._id,
+      ticket: savedTicket,
+    });
+
   } catch (error) {
-    console.error('❌ Error booking ticket:', error);
+    // Enhanced error logging to provide specific details
+    console.error('❌ DATABASE ERROR while booking ticket:', error.message);
+    console.error('Full error object:', JSON.stringify(error, null, 2));
     res.status(500).json({ 
-      error: 'Failed to book ticket',
-      details: error.message 
+      error: 'Failed to book ticket due to a server error.',
+      details: error.message // Send back the specific Mongoose error
     });
   }
 });
 
-// Get user tickets
-router.get('/tickets', async (req, res) => {
+// Get all tickets for a specific user
+router.get('/tickets/user/:userId', async (req, res) => {
   try {
-    // In a real application, you would fetch tickets for the authenticated user
-    // For now, we'll return sample tickets based on database data
-    const routes = await Route.find({}).limit(3);
-    const trains = await Train.find({}).limit(3);
-    
-    const tickets = routes.map((route, index) => {
-      const train = trains[index] || trains[0];
-      return {
-        id: `T${1000 + index + 1}`,
-        trainName: train ? train.trainName : `${route.trainType} Train ${route.trainCode}`,
-        trainNumber: route.trainCode,
-        from: route.from,
-        to: route.to,
-        departureTime: route.departureTime,
-        arrivalTime: route.returnDepartureTime || 'TBD',
-        date: new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        status: index === 2 ? 'Cancelled' : 'Active',
-        seatNumber: `A${10 + index}`,
-        price: calculatePrice(route.trainType, route.from, route.to),
-        passengerName: 'John Doe',
-        bookingDate: new Date().toISOString().split('T')[0]
-      };
-    });
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required.' });
+    }
 
-    res.json({ tickets: tickets });
+    // Find all tickets for the given userId and sort by most recent
+    const userTickets = await Ticket.find({ userId: userId }).sort({ createdAt: -1 });
+
+    if (!userTickets) {
+      return res.json({ tickets: [] }); // Return empty array if no tickets found
+    }
+
+    console.log(`✅ Found ${userTickets.length} tickets for user ${userId}`);
+    res.json({ tickets: userTickets });
+
   } catch (error) {
-    console.error('Error fetching tickets:', error);
-    res.status(500).json({ error: 'Failed to fetch tickets' });
+    console.error('❌ Error fetching user tickets:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch user tickets',
+      details: error.message 
+    });
   }
 });
 

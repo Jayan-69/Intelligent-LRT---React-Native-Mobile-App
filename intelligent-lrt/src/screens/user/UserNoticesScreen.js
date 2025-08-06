@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+
 import {
   View,
   Text,
@@ -12,6 +13,7 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { getServerBaseUrl } from '../../config/apiConfig';
+
 
 const UserNoticesScreen = () => {
   const { colors } = useTheme();
@@ -43,7 +45,7 @@ const UserNoticesScreen = () => {
   const fetchSchedules = useCallback(async () => {
     try {
       const baseUrl = await getServerBaseUrl();
-      const response = await fetch(`${baseUrl}/api/routes`);
+      const response = await fetch(`${baseUrl}/api/schedules`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

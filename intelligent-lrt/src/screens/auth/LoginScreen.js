@@ -1,10 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { 
   View, 
   Text, 
   StyleSheet, 
   TouchableOpacity, 
-  Image, 
+ 
   ActivityIndicator, 
   Alert,
   KeyboardAvoidingView,
@@ -74,7 +74,7 @@ const LoginScreen = ({ navigation, route }) => {
       case 'user':
         userData = {
           id: 'user-123',
-          name: 'John Doe',
+                    name: 'User',
           email: 'user@lrt.com',
           role: 'user'
         };
