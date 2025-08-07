@@ -45,7 +45,7 @@ const UserNoticesScreen = () => {
   const fetchSchedules = useCallback(async () => {
     try {
       const baseUrl = await getServerBaseUrl();
-      const response = await fetch(`${baseUrl}/api/schedules`);
+      const response = await fetch(`${baseUrl}/api/routes`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

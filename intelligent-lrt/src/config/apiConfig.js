@@ -25,6 +25,9 @@ const getLocalIPAddress = () => {
 
 // Common IP addresses to try
 const IP_ADDRESSES_TO_TRY = [
+  // Primary IP address
+  '10.34.215.44',  // Main server IP
+  
   // Platform-specific IPs
   ...(Platform.OS === 'android' ? ['10.0.2.2'] : []),
   ...(Platform.OS === 'ios' ? ['localhost'] : []),
@@ -34,7 +37,6 @@ const IP_ADDRESSES_TO_TRY = [
   '192.168.56.1',    // VirtualBox network IP
   
   // Common development IPs
-  '10.34.215.44',
   '192.168.86.1',  // Local server IP
   '192.168.1.100',
   '192.168.1.101',
@@ -78,6 +80,21 @@ const findWorkingIp = async () => {
       console.log(`❌ Cached IP ${lastWorkingIp} failed, trying others...`);
       lastWorkingIp = null;
     }
+  }
+  
+  // Try the primary IP first (10.34.215.44)
+  try {
+    console.log(`🔍 Trying primary IP: 10.34.215.44`);
+    const response = await axios.get(`http://10.34.215.44:${SERVER_PORT}/test`, { 
+      timeout: 2000 
+    });
+    if (response.status === 200) {
+      lastWorkingIp = '10.34.215.44';
+      console.log(`✅ Primary IP 10.34.215.44 works!`);
+      return '10.34.215.44';
+    }
+  } catch (_error) {
+    console.log(`❌ Primary IP 10.34.215.44 failed, trying others...`);
   }
   
   // Try platform-specific IP first
