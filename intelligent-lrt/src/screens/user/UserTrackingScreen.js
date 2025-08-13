@@ -1,7 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { useEffect, useState } from 'react';
 import SimpleMap from '../../components/SimpleMap';
 import { getTrainsWithLocations, getStationsWithCoordinates } from '../../services/trainLocationService';
 import realtimeService from '../../services/realtimeService';
@@ -98,14 +97,16 @@ const UserTrackingScreen = () => {
         <Text style={[styles.subtitle, { color: colors.placeholder }]}>Track your train in real-time</Text>
       </View>
       
-      <SimpleMap
-        trains={trains}
-        stations={stations}
-        selectedTrain={selectedTrain}
-        onTrainSelect={handleTrainSelect}
-        onStationSelect={handleStationSelect}
-        style={styles.map}
-      />
+      <View style={styles.mapContainer}>
+        <SimpleMap
+          trains={trains}
+          stations={stations}
+          selectedTrain={selectedTrain}
+          onTrainSelect={handleTrainSelect}
+          onStationSelect={handleStationSelect}
+          style={styles.map}
+        />
+      </View>
       
       {selectedTrain && (
         <View style={[styles.trainInfoPanel, { backgroundColor: colors.card }]}>
@@ -146,8 +147,15 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
   },
+  mapContainer: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
   map: {
     flex: 1,
+    width: '100%',
+    height: '100%',
   },
   loadingContainer: {
     flex: 1,

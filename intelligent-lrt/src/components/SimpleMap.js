@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Alert, Animated } from 'react-native';
-import MapView, { Marker, Callout, Polyline } from 'react-native-maps';
+import { View, StyleSheet, Text, Animated } from 'react-native';
+import MapView, { Marker, Callout, UrlTile } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 
 const SimpleMap = ({ 
@@ -42,11 +42,11 @@ const SimpleMap = ({
           duration: 300,
           useNativeDriver: true,
         }).start();
-      });
+      }, [controlsOpacity, legendOpacity]);
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [controlsOpacity, legendOpacity]);
 
   // Debug logging
   useEffect(() => {
@@ -56,36 +56,48 @@ const SimpleMap = ({
 
   // Fit map to show all markers
   useEffect(() => {
-    if (mapRef.current && (trains.length > 0 || stations.length > 0)) {
-      const coordinates = [];
-      
-      // Add train coordinates
-      trains.forEach(train => {
-        if (train.currentLocation?.coordinates) {
-          coordinates.push({
-            latitude: train.currentLocation.coordinates.latitude,
-            longitude: train.currentLocation.coordinates.longitude,
-          });
-        }
+    // Initial map region setup
+    if (mapRef.current) {
+      // Set a default region first
+      setRegion({
+        latitude: 6.9271,
+        longitude: 79.8612,
+        latitudeDelta: 0.1,
+        longitudeDelta: 0.1,
       });
-      
-      // Add station coordinates
-      stations.forEach(station => {
-        if (station.coordinates) {
-          coordinates.push({
-            latitude: station.coordinates.latitude,
-            longitude: station.coordinates.longitude,
-          });
-        }
-      });
-      
-      if (coordinates.length > 0) {
-        mapRef.current.fitToCoordinates(coordinates, {
-          edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
-          animated: true,
-        });
-      }
     }
+    
+    // Delay fitting to coordinates to ensure map is fully rendered
+    const timer = setTimeout(() => {
+      if (mapRef.current && (trains.length > 0 || stations.length > 0)) {
+        const coordinates = [];
+        trains.forEach(train => {
+          if (train.currentLocation?.coordinates) {
+            coordinates.push({
+              latitude: train.currentLocation.coordinates.latitude,
+              longitude: train.currentLocation.coordinates.longitude,
+            });
+          }
+        });
+        stations.forEach(station => {
+          if (station.coordinates) {
+            coordinates.push({
+              latitude: station.coordinates.latitude,
+              longitude: station.coordinates.longitude,
+            });
+          }
+        });
+        if (coordinates.length > 0) {
+          console.log('Fitting map to coordinates');
+          mapRef.current.fitToCoordinates(coordinates, {
+            edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+            animated: true,
+          });
+        }
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, [trains, stations]);
 
   const handleTrainPress = (train) => {
@@ -108,9 +120,9 @@ const SimpleMap = ({
           styles.trainIcon, 
           { 
             backgroundColor: isSelected ? '#ff0000' : '#ff4757',
-            width: isSelected ? 500 : 400,
-            height: isSelected ? 500 : 400,
-            borderRadius: isSelected ? 250 : 200,
+            width: isSelected ? 48 : 40,
+            height: isSelected ? 48 : 40,
+            borderRadius: isSelected ? 24 : 20,
             borderWidth: isSelected ? 15 : 12,
             shadowOpacity: isSelected ? 0.9 : 0.7,
             shadowRadius: isSelected ? 25 : 20,
@@ -119,7 +131,7 @@ const SimpleMap = ({
         ]}>
           <Ionicons 
             name="train" 
-            size={isSelected ? 180 : 150} 
+            size={isSelected ? 24 : 20} 
             color="white" 
           />
         </View>
@@ -141,7 +153,7 @@ const SimpleMap = ({
     // All stations now use the same icon and size
     const backgroundColor = '#3742fa';
     const iconName = 'business';
-    const size = 350; // Much larger rounded icons
+    const size = 32; // Stable station icon size
 
     return (
       <View style={styles.stationMarker}>
@@ -175,12 +187,24 @@ const SimpleMap = ({
         ref={mapRef}
         style={styles.map}
         initialRegion={region}
+        mapType="none"
         showsUserLocation={true}
         showsMyLocationButton={true}
         showsCompass={true}
         showsScale={true}
-        mapType="standard"
+        zoomEnabled={true}
+        pitchEnabled={true}
+        rotateEnabled={true}
+        scrollEnabled={true}
+        moveOnMarkerPress={false}
       >
+        <UrlTile
+          // IMPORTANT: Replace YOUR_MAPTILER_API_KEY with your actual MapTiler API key.
+          urlTemplate="https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=P12gR4SilSvBfSWfTMlK"
+          maximumZ={19}
+          flipY={false}
+        />
+
         {/* Train Markers */}
         {trains.map((train) => {
           if (train.currentLocation?.coordinates) {

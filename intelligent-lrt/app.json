@@ -17,7 +17,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.jp69.intelligentlrtmanagement",
-      "permissions": [],
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"],
       "usesCleartextTraffic": true,
       "googleServicesFile": "./google-services.json"
     },
